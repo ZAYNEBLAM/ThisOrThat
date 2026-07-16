@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - This or That?</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .results-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .results-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            color: white;
+        }
+        .results-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+        }
+        .results-table th,
+        .results-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .results-table th {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .results-table td {
+            font-size: 0.95rem;
+        }
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .player-section {
+            margin-bottom: 30px;
+        }
+        .player-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+        @media (max-width: 600px) {
+            .results-table th,
+            .results-table td {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="results-container">
+        <div class="results-card">
+            <h1 class="results-title">📊 Results</h1>
+            <div id="results-content">
+                <div class="no-results">Loading results...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase.js"></script>
+    <script>
+        async function loadResults() {
+            const resultsContent = document.getElementById('results-content');
+            resultsContent.innerHTML = '<div class="no-results">Loading results...</div>';
+            
+            try {
+                // Get all players
+                const playersSnapshot = await db.collection('players').orderBy('timestamp', 'desc').get();
+                
+                if (playersSnapshot.empty) {
+                    resultsContent.innerHTML = '<div class="no-results">No results yet!</div>';
+                    return;
+                }
+                
+                let html = '';
+                
+                for (const playerDoc of playersSnapshot.docs) {
+                    const player = playerDoc.data();
+                    const playerId = player.id;
+                    const playerTime = player.timestamp ? player.timestamp.toDate().toLocaleString() : 'N/A';
+                    
+                    // Get answers for this player
+                    const answersSnapshot = await db.collection('players').doc(playerId).collection('answers').orderBy('questionNumber').get();
+                    
+                    html += `
+                        <div class="player-section">
+                            <div class="player-header">
+                                🎮 Player: ${playerId} | Time: ${playerTime}
+                            </div>
+                            <table class="results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>Choice</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+                    
+                    if (answersSnapshot.empty) {
+                        html += '<tr><td colspan="3" class="no-results">No answers for this player</td></tr>';
+                    } else {
+                        answersSnapshot.forEach(answerDoc => {
+                            const answer = answerDoc.data();
+                            const answerTime = answer.timestamp ? answer.timestamp.toDate().toLocaleString() : 'N/A';
+                            html += `
+                                <tr>
+                                    <td>Question ${answer.questionNumber}</td>
+                                    <td>${answer.optionTitle}</td>
+                                    <td>${answerTime}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                    
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+                
+                resultsContent.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading results:', error);
+                resultsContent.innerHTML = `<div class="no-results">Error loading results: ${error.message}</div>`;
+            }
+        }
+        
+        // Load results on page load
+        loadResults();
+    </script>
+</body>
+</html>

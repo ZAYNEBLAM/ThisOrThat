@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This or That? 🎮</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="screen active">
+            <div class="card">
+                <h1 class="title">Hello Amine khouya zwin mol 3id milad 👋</h1>
+                <p class="subtitle">So after almost 20 years of being your sibling, I still need a quiz to figure out what like. So i made this game bach n3ref ach kay3jbek hit chhal mabqit chtek atkon tbedelty chwiya. Don t worry I already know the answers... probably.   </p>
+                <button id="start-btn" class="btn btn-primary">Start</button>
+            </div>
+        </div>
+
+        <!-- Question Screen -->
+        <div id="question-screen" class="screen">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="question-header">
+                <span class="question-number" id="question-number">Question 1 of 9</span>
+            </div>
+            <div class="question-text" id="question-text">What do you prefer?</div>
+            <div class="options-container" id="options-container">
+                <!-- Options will be inserted here by JS -->
+            </div>
+            <div class="nav-buttons">
+                <button id="prev-btn" class="btn btn-secondary">Previous</button>
+                <button id="skip-btn" class="btn btn-secondary">Skip</button>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="screen">
+            <div class="card">
+                <h1 class="title">🎉 Ohh, thank you!</h1>
+                <p class="subtitle">You have nice choices 😄 sf yallah hta ntlaqaw  </p>
+                <p class="subtitle">And happy almost birthday !  </p>
+                <button id="finish-btn" class="btn btn-primary">Finish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="firebase.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
